@@ -1,21 +1,27 @@
-# The whole stack: PostgreSQL, the Spring Boot API, and nginx serving the Angular app.
+# The stack as it is deployed: PostgreSQL, the Spring Boot API, and nginx serving the Angular app.
 #
-#   docker compose up --build        then open http://localhost:4200
-#   docker compose up db             only the database, for running the API from an IDE
+# Nothing here is published on the host. Only `web` needs to be reachable, on container port 80:
+#   - locally, docker-compose.override.yml (picked up automatically) publishes it on
+#     http://localhost:4200, together with the API and the database for development;
+#   - on a server, a reverse proxy (Traefik in Dokploy or Coolify, Caddy, ...) routes to web:80.
 #
-# The credentials below are for local use. Set DB_PASSWORD (and WEB_PORT) when hosting.
+#   docker compose up --build        local: this file plus the override
+#   docker compose up db             local: only the database, for running the API from an IDE
+#
+# Set DB_PASSWORD before the first start on a server. The default is for local use only.
 
 services:
   db:
     image: postgres:17-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_DB: trabecula
       POSTGRES_USER: trabecula
       POSTGRES_PASSWORD: ${DB_PASSWORD:-trabecula}
-    ports:
-      - "127.0.0.1:5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+    networks:
+      - default
     healthcheck:
       # Over TCP on purpose: during first start the image runs a temporary server that only
       # listens on the unix socket, and that one must not count as ready.
@@ -26,6 +32,7 @@ services:
 
   api:
     build: ./backend
+    restart: unless-stopped
     environment:
       DB_URL: jdbc:postgresql://db:5432/trabecula
       DB_USER: trabecula
@@ -33,8 +40,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    ports:
-      - "127.0.0.1:8080:8080"
+    networks:
+      - default
     healthcheck:
       # The port opens at the end of start-up, after the migrations and the demo seeding.
       test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080"]
@@ -45,11 +52,16 @@ services:
 
   web:
     build: ./frontend
+    restart: unless-stopped
     depends_on:
       api:
         condition: service_healthy
-    ports:
-      - "${WEB_PORT:-4200}:80"
+    expose:
+      - "80"
+    # Listed explicitly so that a platform which attaches its proxy network to this service
+    # adds to this list instead of replacing the network the API is reached on.
+    networks:
+      - default
 
 volumes:
   db-data:

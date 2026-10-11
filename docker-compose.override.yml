@@ -1,0 +1,17 @@
+# Local development only. `docker compose up` merges this file into docker-compose.yml on its
+# own; a deployment that names the compose file explicitly (-f docker-compose.yml) leaves it out.
+#
+# The API and the database listen on localhost only. WEB_PORT moves the app off 4200.
+
+services:
+  db:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  api:
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  web:
+    ports:
+      - "${WEB_PORT:-4200}:80"
