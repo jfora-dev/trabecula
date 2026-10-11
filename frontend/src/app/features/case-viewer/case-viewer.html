@@ -1,0 +1,90 @@
+@if (loadError(); as message) {
+  <div class="message">
+    <p class="notice" role="alert">This case could not be opened. {{ message }}</p>
+    <a class="button" href="/">Back to all cases</a>
+  </div>
+} @else if (detail(); as c) {
+  <div class="workspace">
+    <app-case-file-panel
+      class="file"
+      [detail]="c"
+      [busy]="transitionBusy()"
+      [error]="transitionError()"
+      (transition)="onTransition($event)"
+    />
+
+    <section class="stage" aria-label="3D view">
+      <div class="stage__bar">
+        <div class="segmented" role="group" aria-label="Workspace">
+          <button
+            type="button"
+            [attr.aria-pressed]="mode() === 'plan'"
+            (click)="setMode('plan')"
+            data-testid="mode-plan"
+          >
+            Plan review
+          </button>
+          <button
+            type="button"
+            [attr.aria-pressed]="mode() === 'ct'"
+            [disabled]="!c.volume"
+            (click)="setMode('ct')"
+            data-testid="mode-ct"
+          >
+            CT segmentation
+          </button>
+        </div>
+        <div class="views" role="group" aria-label="Camera view">
+          @for (view of views; track view.preset) {
+            <button type="button" (click)="setView(view.preset)">{{ view.label }}</button>
+          }
+        </div>
+      </div>
+
+      <app-viewport
+        [layers]="layers()"
+        [side]="c.side"
+        [measuring]="measuring()"
+        [slicePlane]="slicePlane()"
+        (measurementsChange)="measurements.set($event)"
+        (pendingPointChange)="pendingPoint.set($event)"
+        data-testid="viewport"
+      />
+
+      <p class="stage__status" role="status" data-testid="viewer-status">{{ statusLine() }}</p>
+    </section>
+
+    <aside class="tools" aria-label="Tools">
+      @if (mode() === 'plan') {
+        <app-plan-panel
+          [models]="stageModels()"
+          [stage]="stage()"
+          [hasPlan]="hasPlan()"
+          [display]="display()"
+          [measuring]="measuring()"
+          [measurements]="measurements()"
+          (stageChange)="stage.set($event)"
+          (displayChange)="setDisplay($event)"
+          (measuringChange)="measuring.set($event)"
+          (removeMeasurement)="removeMeasurement($event)"
+          (clearMeasurements)="clearMeasurements()"
+        />
+      } @else if (c.volume; as info) {
+        <app-ct-panel
+          [volume]="volume()"
+          [description]="info.description"
+          [failed]="volumeError()"
+          [thresholdHu]="thresholdHu()"
+          [suggestedThresholdHu]="info.suggestedBoneThresholdHu"
+          [stats]="surfaceStats()"
+          [compare]="compare()"
+          (thresholdChange)="thresholdHu.set($event)"
+          (compareChange)="compare.set($event)"
+          (sliceChange)="onSlice($event)"
+        />
+      }
+    </aside>
+  </div>
+} @else {
+  <p class="message" role="status">Loading the case</p>
+}

@@ -1,0 +1,149 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr) 340px;
+  height: 100%;
+}
+
+.file,
+.tools {
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--panel);
+}
+
+.file {
+  border-right: 1px solid var(--rule);
+}
+
+.tools {
+  border-left: 1px solid var(--rule);
+}
+
+.stage {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  background: var(--film);
+  color: var(--on-film);
+}
+
+.stage__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--film-raised);
+
+  .segmented {
+    background: var(--film);
+
+    button {
+      color: var(--on-film-soft);
+
+      &[aria-pressed='true'] {
+        background: var(--gentian);
+        color: #fff;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+
+  button {
+    min-height: 28px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--on-film);
+    font-weight: 550;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--film);
+    }
+  }
+}
+
+.stage :focus-visible {
+  outline-color: var(--gentian-on-film);
+}
+
+.stage__status {
+  min-height: 34px;
+  padding: 8px 14px;
+  background: var(--film-raised);
+  color: var(--on-film-soft);
+  font-size: 13px;
+}
+
+.message {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  max-width: 60ch;
+  margin: 48px auto;
+  padding: 0 24px;
+  color: var(--ink-soft);
+}
+
+// Narrow screens: the 3D view comes first, the two panels follow underneath.
+@media (max-width: 1100px) {
+  :host {
+    height: auto;
+  }
+
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    height: auto;
+  }
+
+  .stage {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    height: min(68vh, 640px);
+  }
+
+  .file,
+  .tools {
+    overflow: visible;
+    border: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .tools {
+    border-left: 1px solid var(--rule);
+  }
+}
+
+@media (max-width: 720px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stage {
+    grid-row: auto;
+    order: -1;
+  }
+
+  .tools {
+    order: 0;
+    border-left: 0;
+  }
+
+  .file {
+    order: 1;
+  }
+}

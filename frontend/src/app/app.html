@@ -1,0 +1,22 @@
+<header class="bar">
+  <a class="brand" routerLink="/">
+    <span class="brand__name">Trabecula</span>
+    <span class="brand__product">Case portal</span>
+  </a>
+  <p class="bar__note">Demo with synthetic data. No real patients, not a medical device.</p>
+  <div class="bar__actions">
+    <span class="bar__message" role="status">{{ demo.message() }}</span>
+    <button
+      type="button"
+      class="button"
+      [disabled]="demo.busy()"
+      (click)="demo.reset()"
+      data-testid="reset-demo"
+    >
+      Restore demo data
+    </button>
+  </div>
+</header>
+<main>
+  <router-outlet />
+</main>

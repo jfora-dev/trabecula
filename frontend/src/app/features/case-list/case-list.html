@@ -1,0 +1,70 @@
+<section class="page">
+  <div class="heading">
+    <h1>Cases</h1>
+    <div class="segmented" role="group" aria-label="Filter by status">
+      @for (option of filters; track option.value) {
+        <button
+          type="button"
+          [attr.aria-pressed]="filter() === option.value"
+          (click)="filter.set(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (error(); as message) {
+    <div class="notice" role="alert">
+      <p>The cases could not be loaded. {{ message }}</p>
+      <button type="button" class="button" (click)="load()">Try again</button>
+    </div>
+  } @else if (cases() === null) {
+    <p class="empty" role="status">Loading cases</p>
+  } @else if (visible().length === 0) {
+    <p class="empty">No cases with this status.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Reference</th>
+          <th scope="col">Case</th>
+          <th scope="col">Patient</th>
+          <th scope="col">Surgeon</th>
+          <th scope="col">Surgery</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of visible(); track item.id) {
+          <tr>
+            <th scope="row">
+              <a
+                class="reference"
+                [routerLink]="['/cases', item.id]"
+                [attr.data-testid]="'case-' + item.reference"
+              >
+                {{ item.reference }}
+              </a>
+            </th>
+            <td>
+              {{ item.title }}
+              <span class="detail">{{ sideLabel[item.side] }} wrist</span>
+            </td>
+            <td class="numeric">{{ item.patientPseudonym }}</td>
+            <td>
+              {{ item.surgeonName }}
+              <span class="detail">{{ item.clinic }}</span>
+            </td>
+            <td class="numeric">{{ formatDay(item.surgeryDate) }}</td>
+            <td>
+              <span class="status" [attr.data-status]="item.status">{{
+                statusLabel[item.status]
+              }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

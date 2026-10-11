@@ -1,0 +1,55 @@
+# The whole stack: PostgreSQL, the Spring Boot API, and nginx serving the Angular app.
+#
+#   docker compose up --build        then open http://localhost:4200
+#   docker compose up db             only the database, for running the API from an IDE
+#
+# The credentials below are for local use. Set DB_PASSWORD (and WEB_PORT) when hosting.
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: trabecula
+      POSTGRES_USER: trabecula
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-trabecula}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      # Over TCP on purpose: during first start the image runs a temporary server that only
+      # listens on the unix socket, and that one must not count as ready.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U trabecula -d trabecula"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/trabecula
+      DB_USER: trabecula
+      DB_PASSWORD: ${DB_PASSWORD:-trabecula}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      # The port opens at the end of start-up, after the migrations and the demo seeding.
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  web:
+    build: ./frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-4200}:80"
+
+volumes:
+  db-data:

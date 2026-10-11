@@ -1,0 +1,212 @@
+@use '@fontsource-variable/instrument-sans/wdth.css';
+
+// Palette taken from the operating theatre rather than from a UI kit: steel instrument
+// trays, blue-black X-ray film, and gentian violet, the dye in surgical skin markers.
+:root {
+  --tray: #e7ebee;
+  --panel: #f6f8f9;
+  --rule: #cdd5db;
+  --ink: #15212b;
+  --ink-soft: #4b5b67;
+  --film: #0a1219;
+  --film-raised: #16232e;
+  --on-film: #dfe7ee;
+  --on-film-soft: #93a4b3;
+  --gentian: #5a3fc0;
+  --gentian-deep: #432b9c;
+  --gentian-wash: #e9e4fa;
+  --gentian-on-film: #b8a6ff;
+
+  --status-design: #36546e;
+  --status-design-wash: #dbe5ee;
+  --status-waiting: #7a4f00;
+  --status-waiting-wash: #fbeccb;
+  --status-approved: #1c6340;
+  --status-approved-wash: #d8efe1;
+  --danger: #a3262b;
+
+  --font: 'Instrument Sans Variable', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--tray);
+  color: var(--ink);
+  font: 400 14px/1.45 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd,
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+a {
+  color: var(--gentian-deep);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gentian);
+  outline-offset: 2px;
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+// Case references are the names people use for cases, so they get the condensed cut.
+.reference {
+  font-stretch: 78%;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+// ---- controls -------------------------------------------------------------------------
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: #fff;
+  font-weight: 550;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--ink-soft);
+  }
+
+  &:disabled {
+    color: var(--ink-soft);
+    background: transparent;
+    cursor: not-allowed;
+  }
+}
+
+.button--primary {
+  border-color: var(--gentian);
+  background: var(--gentian);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    border-color: var(--gentian-deep);
+    background: var(--gentian-deep);
+  }
+}
+
+.button--quiet {
+  min-height: 28px;
+  padding: 0 8px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--gentian-deep);
+
+  &:hover:not(:disabled) {
+    border-color: transparent;
+    background: var(--gentian-wash);
+  }
+}
+
+// A row of mutually exclusive choices, used for view modes and per-model display.
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 7px;
+  background: var(--tray);
+
+  button {
+    min-height: 28px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--ink-soft);
+    font-weight: 550;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 0 0 1px var(--rule);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &[data-status='IN_DESIGN'] {
+    background: var(--status-design-wash);
+    color: var(--status-design);
+  }
+
+  &[data-status='AWAITING_APPROVAL'] {
+    background: var(--status-waiting-wash);
+    color: var(--status-waiting);
+  }
+
+  &[data-status='APPROVED'] {
+    background: var(--status-approved-wash);
+    color: var(--status-approved);
+  }
+}
+
+.notice {
+  padding: 10px 12px;
+  border-left: 3px solid var(--danger);
+  background: #fff;
+  color: var(--danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

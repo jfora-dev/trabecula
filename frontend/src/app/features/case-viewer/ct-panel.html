@@ -1,0 +1,133 @@
+<section>
+  <h2>CT scan</h2>
+  <p class="note" style="margin-top: 0">{{ description() }}</p>
+
+  @if (failed(); as message) {
+    <p class="notice" role="alert">The scan could not be loaded. {{ message }}</p>
+  } @else if (layout(); as l) {
+    <div
+      class="segmented segmented--wide"
+      role="group"
+      aria-label="Slice orientation"
+      style="margin-top: 10px"
+    >
+      @for (option of axes; track option.value) {
+        <button
+          type="button"
+          [attr.aria-pressed]="axis() === option.value"
+          (click)="axis.set(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+
+    <div class="slice">
+      <canvas
+        #slice
+        [style.aspect-ratio]="l.widthMm + ' / ' + l.heightMm"
+        aria-label="CT slice"
+        data-testid="ct-slice"
+      ></canvas>
+    </div>
+
+    <div class="field">
+      <label for="slice-index">Slice</label>
+      <output class="numeric"
+        >{{ index() + 1 }} of {{ l.count }}, at {{ positionMm().toFixed(1) }} mm</output
+      >
+      <input
+        id="slice-index"
+        type="range"
+        min="0"
+        [max]="l.count - 1"
+        step="1"
+        [value]="index()"
+        (input)="index.set(number($event))"
+        data-testid="slice-index"
+      />
+    </div>
+
+    <div class="row" style="margin-top: 12px">
+      <span>Grey window</span>
+      <div class="segmented" role="group" aria-label="Grey window">
+        @for (option of windows; track option.value) {
+          <button
+            type="button"
+            [attr.aria-pressed]="windowName() === option.value"
+            (click)="windowName.set(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+  } @else {
+    <p class="note" role="status">Loading the scan</p>
+  }
+</section>
+
+@if (volume()) {
+  <section>
+    <h2>Bone threshold</h2>
+    <div class="field" style="margin-top: 0">
+      <label for="threshold">Count as bone from</label>
+      <output class="numeric" data-testid="threshold-value">{{ thresholdHu() }} HU</output>
+      <input
+        id="threshold"
+        type="range"
+        min="-300"
+        max="1500"
+        step="10"
+        [value]="thresholdHu()"
+        (input)="thresholdChange.emit(number($event))"
+        data-testid="threshold"
+      />
+    </div>
+    <div class="row" style="margin-top: 8px">
+      <button
+        type="button"
+        class="button button--quiet"
+        [disabled]="thresholdHu() === suggestedThresholdHu()"
+        (click)="thresholdChange.emit(suggestedThresholdHu())"
+      >
+        Back to {{ suggestedThresholdHu() }} HU
+      </button>
+    </div>
+
+    <label class="check">
+      <input type="checkbox" [checked]="tint()" (change)="tint.set(checked($event))" />
+      <span>Tint the voxels that count as bone in the slice</span>
+    </label>
+    <label class="check">
+      <input
+        type="checkbox"
+        [checked]="compare()"
+        (change)="compareChange.emit(checked($event))"
+        data-testid="compare"
+      />
+      <span>Show the designer's bone models inside the result</span>
+    </label>
+  </section>
+
+  <section>
+    <h2>Surface</h2>
+    @if (stats(); as s) {
+      <dl class="stats numeric">
+        <dt>Triangles</dt>
+        <dd data-testid="surface-triangles">{{ formatCount(s.triangleCount) }}</dd>
+        <dt>Rebuilt in</dt>
+        <dd>{{ s.elapsedMs.toFixed(0) }} ms</dd>
+        <dt>Volume above threshold</dt>
+        <dd>{{ formatVolumeCm3(s.voxelMm3) }}</dd>
+      </dl>
+    } @else {
+      <p class="note" role="status" style="margin-top: 0">Building the surface</p>
+    }
+    <p class="note">
+      The 3D surface is rebuilt from the voxels each time the threshold moves, using marching cubes
+      in a background worker. A single threshold cannot separate touching bones, which is why a
+      designer still prepares the models.
+    </p>
+  </section>
+}

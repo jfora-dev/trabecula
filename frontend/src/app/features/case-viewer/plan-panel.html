@@ -1,0 +1,89 @@
+<section>
+  <h2>Stage</h2>
+  <div class="segmented segmented--wide" role="group" aria-label="Stage">
+    <button
+      type="button"
+      [attr.aria-pressed]="stage() === 'PREOP'"
+      (click)="stageChange.emit('PREOP')"
+      data-testid="stage-preop"
+    >
+      Before surgery
+    </button>
+    <button
+      type="button"
+      [attr.aria-pressed]="stage() === 'PLANNED'"
+      [disabled]="!hasPlan()"
+      (click)="stageChange.emit('PLANNED')"
+      data-testid="stage-planned"
+    >
+      Planned result
+    </button>
+  </div>
+  @if (!hasPlan()) {
+    <p class="note">This case has no plan yet, so only the scan-based models are shown.</p>
+  }
+</section>
+
+<section>
+  <h2>Models</h2>
+  <ul class="models">
+    @for (model of models(); track model.id) {
+      <li [attr.data-testid]="'model-' + model.kind">
+        <span class="swatch" [style.background]="model.color"></span>
+        <span class="models__name">
+          {{ model.name }}
+          <span class="models__meta numeric">{{ formatCount(model.triangleCount) }} triangles</span>
+        </span>
+        <div class="segmented" role="group" [attr.aria-label]="'Display of ' + model.name">
+          @for (option of displays; track option.value) {
+            <button
+              type="button"
+              [attr.aria-pressed]="(display()[model.id] ?? 'solid') === option.value"
+              (click)="displayChange.emit({ modelId: model.id, display: option.value })"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+</section>
+
+<section>
+  <h2>Measure</h2>
+  <div class="row">
+    <button
+      type="button"
+      class="button"
+      [class.button--primary]="measuring()"
+      [attr.aria-pressed]="measuring()"
+      (click)="measuringChange.emit(!measuring())"
+      data-testid="measure-toggle"
+    >
+      {{ measuring() ? 'Stop measuring' : 'Measure a distance' }}
+    </button>
+    @if (measurements().length > 0) {
+      <button type="button" class="button button--quiet" (click)="clearMeasurements.emit()">
+        Remove all
+      </button>
+    }
+  </div>
+  @if (measurements().length > 0) {
+    <ol class="measurements" data-testid="measurements">
+      @for (m of measurements(); track m.id; let n = $index) {
+        <li>
+          <span>Distance {{ n + 1 }}</span>
+          <strong class="numeric">{{ formatDistance(m.distanceMm) }}</strong>
+          <button type="button" class="button button--quiet" (click)="removeMeasurement.emit(m.id)">
+            Remove
+          </button>
+        </li>
+      }
+    </ol>
+  }
+  <p class="note">
+    Click two points on a solid model. The result is the straight line between them and cannot be
+    finer than the scan it comes from.
+  </p>
+</section>

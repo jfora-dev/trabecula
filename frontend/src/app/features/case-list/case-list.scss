@@ -1,0 +1,124 @@
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 36px 24px 48px;
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 34px;
+    font-weight: 650;
+    font-stretch: 78%;
+    line-height: 1.1;
+  }
+
+  .segmented {
+    background: #d9dfe4;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border-top: 2px solid var(--ink);
+}
+
+th,
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  padding-block: 9px;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  font-weight: 550;
+}
+
+tbody tr {
+  position: relative;
+
+  &:hover {
+    background: #fff;
+  }
+}
+
+.reference {
+  font-size: 17px;
+  text-decoration: none;
+
+  // Stretch the link over the whole row so the row is the click target.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    &::after {
+      outline: 2px solid var(--gentian);
+      outline-offset: -2px;
+    }
+  }
+}
+
+.detail {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+
+.empty {
+  padding: 40px 0;
+  color: var(--ink-soft);
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 24px 16px 40px;
+  }
+
+  // Each case becomes a block: reference and status on top, the rest below.
+  table,
+  tbody,
+  tr,
+  th,
+  td {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody tr {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  th,
+  td {
+    padding: 2px 0;
+    border: 0;
+  }
+}

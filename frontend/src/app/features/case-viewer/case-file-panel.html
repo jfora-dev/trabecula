@@ -1,0 +1,144 @@
+@let c = detail();
+<a class="back" routerLink="/">All cases</a>
+
+<header>
+  <h1 class="reference" data-testid="case-reference">{{ c.reference }}</h1>
+  <p class="title">{{ c.title }}</p>
+  <span class="status" [attr.data-status]="c.status" data-testid="case-status">{{
+    statusLabel[c.status]
+  }}</span>
+</header>
+
+<dl class="facts">
+  <div>
+    <dt>Patient</dt>
+    <dd class="numeric">{{ c.patientPseudonym }}, born {{ c.patientBirthYear }}</dd>
+  </div>
+  <div>
+    <dt>Site</dt>
+    <dd>{{ sideLabel[c.side] }} wrist</dd>
+  </div>
+  <div>
+    <dt>Surgeon</dt>
+    <dd>{{ c.surgeonName }}, {{ c.clinic }}</dd>
+  </div>
+  <div>
+    <dt>Designer</dt>
+    <dd>{{ c.designerName }}</dd>
+  </div>
+  <div>
+    <dt>Surgery</dt>
+    <dd class="numeric">{{ formatDay(c.surgeryDate) }}</dd>
+  </div>
+</dl>
+
+<section>
+  <h2>Plan</h2>
+  @if (c.planNotes) {
+    <p class="plan">{{ c.planNotes }}</p>
+  } @else {
+    <p class="plan plan--empty">
+      No plan yet. The designer is segmenting the scan and preparing a first proposal.
+    </p>
+  }
+</section>
+
+<section class="decision" data-testid="decision">
+  <h2>Decision</h2>
+  @if (error(); as message) {
+    <p class="notice" role="alert">{{ message }}</p>
+  }
+
+  @if (c.status === 'APPROVED') {
+    <p>
+      @if (approval(); as event) {
+        Approved by {{ event.actor }} on {{ formatMoment(event.occurredAt) }}.
+      }
+      The order is binding and the devices go into production.
+    </p>
+  } @else if (c.status === 'AWAITING_APPROVAL') {
+    @if (requestingChanges()) {
+      <label for="change-request">What should the designer change?</label>
+      <textarea
+        id="change-request"
+        rows="4"
+        maxlength="2000"
+        [value]="comment()"
+        (input)="comment.set($any($event.target).value)"
+        data-testid="change-comment"
+      ></textarea>
+      <div class="actions">
+        <button
+          type="button"
+          class="button button--primary"
+          [disabled]="busy() || !comment().trim()"
+          (click)="sendChangeRequest()"
+          data-testid="send-change-request"
+        >
+          Send request
+        </button>
+        <button type="button" class="button" (click)="requestingChanges.set(false)">Cancel</button>
+      </div>
+    } @else {
+      <p>
+        Check the planned result in 3D. Approving places the binding order for the plate and the
+        guide.
+      </p>
+      <div class="actions">
+        <button
+          type="button"
+          class="button button--primary"
+          [disabled]="busy() || !can().has('APPROVE')"
+          (click)="send('APPROVE')"
+          data-testid="approve"
+        >
+          {{ actionLabel.APPROVE }}
+        </button>
+        <button
+          type="button"
+          class="button"
+          [disabled]="busy() || !can().has('REQUEST_CHANGES')"
+          (click)="requestingChanges.set(true)"
+          data-testid="request-changes"
+        >
+          {{ actionLabel.REQUEST_CHANGES }}
+        </button>
+      </div>
+    }
+  } @else {
+    <p>
+      @if (hasPlan()) {
+        The designer is revising the plan. It returns here for approval once it is submitted.
+      } @else {
+        Nothing to decide yet. The plan appears here once the designer submits it.
+      }
+    </p>
+    <div class="actions">
+      <button
+        type="button"
+        class="button"
+        [disabled]="busy() || !hasPlan() || !can().has('SUBMIT_FOR_APPROVAL')"
+        (click)="send('SUBMIT_FOR_APPROVAL')"
+        data-testid="submit"
+      >
+        {{ actionLabel.SUBMIT_FOR_APPROVAL }}
+      </button>
+      <span class="hint">Designer's step, shown here because the demo has no sign-in.</span>
+    </div>
+  }
+</section>
+
+<section>
+  <h2>History</h2>
+  <ol class="history">
+    @for (event of history(); track event.id) {
+      <li>
+        <p class="history__what">{{ describeEvent(event) }}</p>
+        <p class="history__who numeric">{{ event.actor }}, {{ formatMoment(event.occurredAt) }}</p>
+        @if (event.comment) {
+          <p class="history__comment">{{ event.comment }}</p>
+        }
+      </li>
+    }
+  </ol>
+</section>

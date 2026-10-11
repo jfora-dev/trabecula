@@ -1,0 +1,145 @@
+:host {
+  display: block;
+  padding: 16px 20px 28px;
+  overflow-y: auto;
+  background: var(--panel);
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-weight: 550;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+header {
+  .reference {
+    font-size: 30px;
+    line-height: 1.05;
+  }
+
+  .title {
+    margin: 4px 0 10px;
+    font-size: 15px;
+  }
+}
+
+.facts {
+  margin-top: 18px;
+  border-top: 1px solid var(--rule);
+
+  div {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  dt {
+    color: var(--ink-soft);
+  }
+}
+
+section {
+  margin-top: 22px;
+}
+
+h2 {
+  margin-bottom: 6px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.plan--empty,
+.hint {
+  color: var(--ink-soft);
+}
+
+.decision {
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: #fff;
+
+  .notice {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: #fbeceb;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 550;
+  }
+
+  textarea {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    resize: vertical;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.hint {
+  flex-basis: 100%;
+  font-size: 12.5px;
+}
+
+.history {
+  li {
+    position: relative;
+    padding: 0 0 14px 18px;
+    border-left: 1px solid var(--rule);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -4px;
+      top: 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ink-soft);
+    }
+
+    &:first-child::before {
+      background: var(--gentian);
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+}
+
+.history__what {
+  font-weight: 550;
+}
+
+.history__who {
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+
+.history__comment {
+  margin-top: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--tray);
+}

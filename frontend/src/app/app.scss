@@ -1,0 +1,81 @@
+:host {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100dvh;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 52px;
+  padding: 8px 20px;
+  background: var(--film);
+  color: var(--on-film);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand__name {
+  font-size: 21px;
+  font-weight: 700;
+  font-stretch: 76%;
+  letter-spacing: 0.02em;
+}
+
+.brand__product {
+  color: var(--on-film-soft);
+}
+
+.bar__note {
+  flex: 1;
+  color: var(--on-film-soft);
+  font-size: 13px;
+}
+
+.bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bar__message {
+  font-size: 13px;
+}
+
+.bar .button {
+  border-color: #38495a;
+  background: transparent;
+  color: var(--on-film);
+
+  &:hover:not(:disabled) {
+    border-color: var(--on-film-soft);
+  }
+}
+
+main {
+  min-height: 0;
+  overflow: auto;
+}
+
+@media (max-width: 760px) {
+  .bar {
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+
+  .bar__note {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .bar__actions {
+    margin-left: auto;
+  }
+}

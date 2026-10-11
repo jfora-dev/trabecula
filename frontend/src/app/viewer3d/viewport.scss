@@ -1,0 +1,75 @@
+:host {
+  position: relative;
+  display: block;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--film);
+}
+
+canvas,
+.annotations {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+canvas {
+  display: block;
+  touch-action: none;
+  outline-offset: -3px;
+}
+
+.annotations {
+  pointer-events: none;
+}
+
+.unavailable {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  max-width: 44ch;
+  margin: auto;
+  padding: 24px;
+  color: var(--on-film);
+  text-align: center;
+}
+
+// The overlay's children are created by AnnotationOverlay, outside Angular's templates.
+:host ::ng-deep {
+  .measure-halo {
+    stroke: rgb(10 18 25 / 70%);
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+
+  .measure-line {
+    stroke: var(--gentian-on-film);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .measure-point {
+    fill: #fff;
+    stroke: var(--gentian);
+    stroke-width: 2.5;
+  }
+
+  .measure-point--pending {
+    fill: var(--gentian-on-film);
+    stroke: #fff;
+  }
+
+  .measure-label rect {
+    fill: #fff;
+    stroke: rgb(10 18 25 / 35%);
+  }
+
+  .measure-label text {
+    fill: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}

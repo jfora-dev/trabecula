@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: trabecula-portal
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/trabecula}
+    username: ${DB_USER:trabecula}
+    password: ${DB_PASSWORD:trabecula}
+  jpa:
+    # Entities are mapped to DTOs inside service transactions; no lazy loading while rendering.
+    open-in-view: false
+    hibernate:
+      # Flyway owns the schema. The integration test additionally runs Hibernate's schema
+      # validation, so a mapping that drifts from the migrations fails in CI.
+      ddl-auto: none
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: ${PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,application/problem+json,model/stl
+    min-response-size: 2KB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+portal:
+  demo:
+    # Seeds the synthetic cases and exposes POST /api/demo/reset. Switch off outside the demo.
+    enabled: ${DEMO_ENABLED:true}
